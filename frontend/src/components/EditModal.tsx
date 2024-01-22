@@ -10,31 +10,33 @@ import {
     useDisclosure
 } from "@nextui-org/react";
 import {FaPen} from "react-icons/fa";
-import React, {useEffect} from "react";
+import React from "react";
+import { Todo as T } from "../types/todo";
+import {useTodoStore} from "../store/todoStore.ts";
+import {updateData} from "../api/fetchTodo.ts";
 
-type T = {
-    key: number,
-    isDone: boolean,
-    todo: string
-}
-
-export default function EditModal({ todo, callback } : {
+export default function EditModal({ todo } : {
     todo: T,
-    callback: (todo: T) => void
 }) {
+    const { editTodo } = useTodoStore(state => {
+        return {editTodo: state.editTodo}
+    })
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
-    const [changedTodo, setChangedTodo] = React.useState(todo);
+    const [changedTodo, setChangedTodo] = React.useState(todo.title);
 
-    function changeTodo(onClose: () => void) {
-        // console.log(changedTodo);
-        callback(changedTodo);
+    async function changeTodo(onClose: () => void) {
+        todo = {...todo, title: changedTodo};
+        const {data: {data}} = await updateData(todo);
+        if (data.status === 'success') {
+            editTodo({
+                _id: todo._id,
+                title: changedTodo,
+                status: todo.status
+            });
+        }
+        editTodo(todo);
         onClose();
     }
-
-    useEffect(() => {
-        console.log(changedTodo)
-        callback(changedTodo);
-    }, [changedTodo]);
 
     return (
         <>
@@ -60,8 +62,8 @@ export default function EditModal({ todo, callback } : {
                                     autoFocus
                                     label="Todo"
                                     variant="bordered"
-                                    defaultValue={changedTodo.todo}
-                                    onChange={() => setChangedTodo({...changedTodo})}
+                                    defaultValue={changedTodo}
+                                    onChange={(event) => setChangedTodo(event.target.value)}
                                     inputMode={"text"}
                                 />
                             </ModalBody>

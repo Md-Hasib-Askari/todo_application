@@ -11,25 +11,29 @@ import React, {useEffect} from "react";
 import {FaTrash} from "react-icons/fa";
 import {toast, Toaster} from "react-hot-toast";
 import {addData, getData, deleteData, updateData} from "./api/fetchTodo.ts";
+import {useTodoStore} from "./store/todoStore.ts";
+import {Todo} from "./types/todo.ts";
+import EditModal from "./components/EditModal.tsx";
 
 const columns = [
     {name: "Todo", uid: "isDone"},
     {name: "Action", uid: "action"},
 ];
 
-type Todo = {
-    _id: string,
-    title: string,
-    status: boolean,
-};
-
 function App() {
     // const [selected, setSelected] = React.useState<Key>(0);
-    const [rows, setRows] = React.useState<Todo[]>([]);
+    const {todoList, setTodoList, addTodo, toggleTodo, removeTodo} = useTodoStore(state => {
+        return {
+            todoList: state.todoList,
+            setTodoList: state.setTodoList,
+            addTodo: state.addTodo,
+            toggleTodo: state.toggleTodo,
+            removeTodo: state.removeTodo
+        }
+    })
     const inputRef = React.useRef<HTMLInputElement>(null);
 
     const renderCell = React.useCallback((todo: Todo, columnKey: React.Key) => {
-        // console.log(todo, columnKey, key)
         switch (columnKey) {
             case "isDone":
                 return (
@@ -40,7 +44,7 @@ function App() {
             case "action":
                 return (
                     <div className="relative flex jus items-center gap-2">
-                        {/*<EditModal todo={todo} callback={editTodo} />*/}
+                        <EditModal todo={todo} />
                         <Tooltip color="danger" content="Delete Todo">
                             <Button className="text-lg text-danger cursor-pointer active:opacity-50"
                                 onClick={() => deleteTodo(todo)}
@@ -53,7 +57,7 @@ function App() {
             default:
                 return null;
         }
-    }, [rows])
+    }, [todoList])
 
     useEffect(() => {
         (async () => {
@@ -64,29 +68,29 @@ function App() {
         })();
     }, []);
 
-    const addTodo = async () => {
+    const addTodoForm = async () => {
         const todo = inputRef.current?.value;
         if (todo) {
             inputRef.current!.value = "";
             inputRef.current.focus();
             const newTodo: Todo = {
+                _id: "",
                 title: todo,
                 status: false,
             }
             const {data: {data}} = await addData(newTodo)
-            console.log(data);
-            sortingTodos([data, ...rows]);
+            addTodo(data);
+            sortingTodos([data, ...todoList]);
         } else {
             toast.error("Please enter a todo");
         }
     }
-    // use zustand to store data (future update...)
-    const editTodo = () => {}
     const deleteTodo = async (todo: Todo) => {
         const {data} = await deleteData(todo._id);
         if (data.status === 'success') {
             const res = await getData();
             if (res.data.status === 'success') {
+                removeTodo(todo);
                 sortingTodos(res.data.data);
             }
             toast.success("Todo deleted successfully!")
@@ -99,6 +103,11 @@ function App() {
         if (data.status === "success") {
             const res = await getData();
             if (res.data.status === 'success') {
+                toggleTodo({
+                    _id: todo._id,
+                    title: todo.title,
+                    status: todo.status
+                });
                 sortingTodos(res.data.data);
             }
         }
@@ -107,8 +116,7 @@ function App() {
         const todoDone = data.filter((item) => item.status).reverse()
         const todoNotDone = data.filter((item) => !item.status)
 
-        setRows(() => [...todoNotDone, ...todoDone]);
-        console.log([...todoNotDone, ...todoDone])
+        setTodoList([...todoNotDone, ...todoDone]);
     }
   return (
     <div className="h-screen flex justify-center">
@@ -122,7 +130,7 @@ function App() {
                 <form className="w-full flex gap-2 justify-between"
                     onSubmit={(e) => {
                         e.preventDefault();
-                        addTodo();
+                        addTodoForm();
                     }}
                 >
                     <input ref={inputRef} className="input input-success input-block flex-grow" placeholder="What to do next?"/>
@@ -152,7 +160,7 @@ function App() {
                     </TableHeader>
                     <TableBody>
                         {
-                            rows.map((item, key) => (
+                            todoList.map((item, key) => (
                                 <TableRow key={key}>
                                     {(columnKey) => <TableCell width={'100%'}>{renderCell(item, columnKey)}</TableCell>}
                                 </TableRow>

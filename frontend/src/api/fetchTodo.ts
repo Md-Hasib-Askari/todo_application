@@ -4,7 +4,7 @@ export async function getData() {
     return await axios.get("http://localhost:5000/api/v1/get-todo/");
 }
 
-export async function addData({title, description, status}: {
+export async function addData({title, status}: {
     title: string;
     status: boolean;
 }) {
