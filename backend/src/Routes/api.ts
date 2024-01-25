@@ -6,6 +6,7 @@ const router = require("express").Router();
 import * as TodoController from "../Controllers/TodoController";
 import * as UserController from "../Controllers/UserController";
 import UserModel from "../Models/UserModel";
+import authVerify from "../Middlewares/AuthVerify";
 
 // Test
 router.get("/", (req: Request, res: Response) => {
@@ -20,11 +21,11 @@ router.put("/update-todo/:id", TodoController.updateTodo);
 router.delete("/delete-todo/:id", TodoController.deleteTodo);
 
 // User
-router.post("/register", UserController.register);
+router.post("/register", authVerify, UserController.register);
 router.post("/login", UserController.login);
-router.get("/otp", UserController.otp);
+router.get("/otp", authVerify, UserController.otp);
 router.get("/logout", UserController.logout);
-router.get("/getUsers", async (_req: Request, res: Response) => {
+router.get("/getUsers", authVerify, async (_req: Request, res: Response) => {
   try {
     const users = await UserModel.find({});
     res.status(200).json({users});

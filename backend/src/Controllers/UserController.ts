@@ -6,6 +6,8 @@ import {IUser} from "../types/user";
 import 'dotenv/config';
 import { env } from 'node:process';
 
+const jwt_token: string = env.JWT_SECRET as string;
+
 export const register = async (req: Request, res: Response) => {
   const { email, password } = req.body as { email: string; password: string };
   // @ts-ignore
@@ -23,6 +25,11 @@ export const register = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body as {email: string, password: string};
+  const cookieEmail = req.headers.email as string;
+  if (cookieEmail) {
+      res.status(200).json({message: "Already Logged In"})
+      return;
+  }
   try {
     const user = await UserModel.findOne<IUser>({email});
     if (!user) res.status(401).json({message: "Invalid User"})
@@ -30,8 +37,10 @@ export const login = async (req: Request, res: Response) => {
       const result = await bcrypt.compare(password, user.password);
         if (!result) res.status(401).json({message: "Invalid Credentials"})
         else {
+
+            // @ts-ignore
             const token: string = jwt.sign({_id: user._id, email},
-                env.JWT_SECRET,
+                jwt_token,
                 {expiresIn: '1h'})
             res.cookie('token', token, {httpOnly: true});
             const {password, ...rest} = user;
