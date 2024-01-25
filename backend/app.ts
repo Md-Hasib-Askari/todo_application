@@ -9,12 +9,14 @@ const helmet = require("helmet");
 const hpp = require("hpp");
 const xssClean = require("xss-clean");
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 
 import apiRouter from "./src/Routes/api";
 const demoMiddleware = require("./src/Middlewares/demo");
 
 // Middlewares
 app.use(bodyParser.json());
+app.use(cookieParser());
 app.use(cors());
 app.use(helmet());
 app.use(hpp({ checkBody: true, checkQuery: true }));
