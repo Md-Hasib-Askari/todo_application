@@ -1,12 +1,9 @@
-/*
- * Add all your Routes here and export them
- */
 import { Request, Response } from "express";
 const router = require("express").Router();
 import * as TodoController from "../Controllers/TodoController";
 import * as UserController from "../Controllers/UserController";
 import UserModel from "../Models/UserModel";
-import authVerify from "../Middlewares/AuthVerify";
+import {authVerify} from "../Middlewares/AuthVerify";
 
 // Test
 router.get("/", (req: Request, res: Response) => {
@@ -14,17 +11,18 @@ router.get("/", (req: Request, res: Response) => {
 });
 
 // Todo
-router.post("/add-todo", TodoController.createTodo);
-router.get("/get-todo", TodoController.getTodos);
-router.get("/get-todo/:id", TodoController.getTodoByID);
-router.put("/update-todo/:id", TodoController.updateTodo);
-router.delete("/delete-todo/:id", TodoController.deleteTodo);
+router.post("/add-todo", authVerify, TodoController.createTodo);
+router.get("/get-todo", authVerify, TodoController.getTodos);
+router.get("/get-todo/:id", authVerify, TodoController.getTodoByID);
+router.put("/update-todo/:id", authVerify, TodoController.updateTodo);
+router.delete("/delete-todo/:id", authVerify, TodoController.deleteTodo);
 
 // User
-router.post("/register", authVerify, UserController.register);
+router.post("/register", UserController.register);
 router.post("/login", UserController.login);
-router.get("/otp", authVerify, UserController.otp);
-router.get("/logout", UserController.logout);
+router.post("/isLoggedIn", UserController.isLoggedIn);
+router.get("/otp", UserController.otp);
+router.get("/logout", authVerify, UserController.logout);
 router.get("/getUsers", authVerify, async (_req: Request, res: Response) => {
   try {
     const users = await UserModel.find({});

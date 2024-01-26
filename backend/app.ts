@@ -1,9 +1,5 @@
-/*
- * Add all your Express app configurations here
- * */
-
 const app = require("express")();
-require("dotenv").config({ path: "./.env" });
+import {env} from "node:process";
 const cors = require("cors");
 const helmet = require("helmet");
 const hpp = require("hpp");
@@ -23,8 +19,9 @@ app.use(hpp({ checkBody: true, checkQuery: true }));
 app.use(xssClean());
 
 // Database Connection
+const MONGODB_URI = env.MONGODB_URI as string;
 const mongoose = require('mongoose');
-mongoose.connect(process.env.MONGODB_URI, {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect(MONGODB_URI, {useNewUrlParser: true, useUnifiedTopology: true});
 
 // Routes
 app.use('/api/v1', apiRouter);

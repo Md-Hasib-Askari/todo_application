@@ -20,7 +20,7 @@ export default {
         colorScheme: "light",
         colors: {
           primary: "#235264",
-          backgroundPrimary: "#964643",
+          backgroundPrimary: "#1f1f1f",
         },
       },
       {
@@ -28,7 +28,7 @@ export default {
         colorScheme: "dark",
         colors: {
           primary: "#573242",
-          backgroundPrimary: "#1a1a1a",
+          backgroundPrimary: "#2a2a2a",
         },
       },
     ],

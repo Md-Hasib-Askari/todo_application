@@ -1,5 +1,19 @@
 import axios from "axios";
 
+axios.interceptors.request.use(
+    (config) => {
+        const token = document.cookie as string;
+        if (token) {
+            config.headers["Authorization"] = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        console.log(error)
+        Promise.reject(error);
+    }
+);
+
 export async function getData() {
     return await axios.get("http://localhost:5000/api/v1/get-todo/");
 }
