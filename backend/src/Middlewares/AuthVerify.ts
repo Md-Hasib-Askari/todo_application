@@ -14,7 +14,6 @@ export const authVerify = async (req: Request, res: Response, next: NextFunction
   } else {
     token = req.cookies.token as string;
   }
-  console.log(token)
   jwt.verify(token, jwt_token, (err: any, decoded: any) => {
     if (err) {
       res.status(401).json({status: "unauthorized"});
