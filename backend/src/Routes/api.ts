@@ -23,6 +23,7 @@ router.post("/login", UserController.login);
 router.post("/isLoggedIn", UserController.isLoggedIn);
 router.get("/otp", UserController.otp);
 router.get("/logout", authVerify, UserController.logout);
+router.post("/change-password", authVerify, UserController.changePassword);
 router.get("/getUsers", authVerify, async (_req: Request, res: Response) => {
   try {
     const users = await UserModel.find({});

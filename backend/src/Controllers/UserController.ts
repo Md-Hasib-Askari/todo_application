@@ -79,3 +79,20 @@ export const logout = (req: Request, res: Response) => {
     res.clearCookie('token');
     res.status(200).json({message: "Logged Out"});
 };
+
+export const changePassword = async (req: Request, res: Response) => {
+  const {email} = req.headers as {email: string};
+    const {password} = req.body as {password: string};
+    const saltRounds: number = parseInt(SALT_ROUNDS) | 10;
+    const hashedPassword: string = await bcrypt.hash(password, saltRounds);
+    try {
+        const user = await UserModel.findOne({email});
+        if (!user) res.status(401).json({message: "Invalid User"})
+        else {
+            await UserModel.updateOne({email}, {password: hashedPassword});
+            res.status(200).json({message: "Password Changed Successfully"});
+        }
+    } catch (e) {
+        res.status(500).json({message: (e as Error).message})
+    }
+}

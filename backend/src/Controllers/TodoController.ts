@@ -2,20 +2,22 @@ import { Request, Response } from "express";
 import { ITodo } from "../types/todo";
 import todoModel from "../Models/TodoModel";
 import TodoModel from "../Models/TodoModel";
+import UserModel from "../Models/UserModel";
 
 // Create
 const createTodo = async (req: Request, res: Response): Promise<void> => {
+  const {email} = req.headers as {email: string};
   try {
     const reqBody = req.body as Pick<ITodo, "title" | "description" | "status">;
-    console.log(reqBody);
     const todo: ITodo = new TodoModel({
         title: reqBody.title,
         description: reqBody.description,
         status: reqBody.status,
+        author: email
     });
     const newTodo: ITodo = await todo.save();
 
-    res.status(201).json({ status: "success", data: newTodo });
+    res.status(201).json({ status: "success", data: todo });
   } catch (err: any) {
     res.status(404).json({ status: "fail", data: {message: err.message} });
   }
@@ -23,9 +25,11 @@ const createTodo = async (req: Request, res: Response): Promise<void> => {
 
 // Read
 const getTodos = async (req: Request, res: Response): Promise<void> => {
+  const {email} = req.headers as {email: string};
   try {
     let data: ITodo[] = await todoModel.aggregate([
-      {$sort: {createdAt: -1}}
+        {$match: {author: email}},
+        {$sort: {createdAt: -1}}
     ]);
     res.status(200).json({ status: "success", data: data });
   } catch (err) {

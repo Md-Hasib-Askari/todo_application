@@ -57,3 +57,14 @@ export async function logout() {
     return e.response;
   }
 }
+
+export async function changePassword(password: string) {
+  try {
+    return await axios.post(
+        `http://localhost:5000/api/v1/change-password/`,
+        {password}
+    );
+  } catch (e: any) {
+    return e.response;
+  }
+}

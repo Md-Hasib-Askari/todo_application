@@ -5,15 +5,17 @@ import {
   Dropdown,
   DropdownItem,
   DropdownMenu,
-  DropdownTrigger, Link
+  DropdownTrigger, useDisclosure
 } from "@nextui-org/react";
-import {useState} from "react";
+import {Key, useState} from "react";
 import {FaMoon, FaSun} from "react-icons/fa6";
 import {userStore} from "../store/userStore.ts";
 import * as fetchUser from "../api/fetchUser.ts";
 import {redirect} from "react-router-dom";
+import ChangePasswordModal from "./ChangePasswordModal.tsx";
 
 export default function AvatarComponent() {
+  const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
   const [darkMode, setDarkMode] = useState<boolean>(false);
   const {isLoggedIn, setIsLoggedIn} = userStore((state) => ({
     isLoggedIn: state.isLoggedIn,
@@ -23,16 +25,21 @@ export default function AvatarComponent() {
     setDarkMode(!darkMode);
     document.documentElement.classList.toggle("dark");
   }
-  const handleLogout = async () => {
-    const response = await fetchUser.logout();
-    if (response.status === 200) {
-      document.cookie = "";
-      setIsLoggedIn(false);
-      redirect("/");
+  const handleDropdown = async (key: Key) => {
+    if (key === "logout") {
+      const response = await fetchUser.logout();
+      if (response.status === 200) {
+        document.cookie = "";
+        setIsLoggedIn(false);
+        redirect("/");
+      }
+    } else if (key === "changePassword") {
+      onOpen();
     }
   }
   return (
       <div className="flex items-center gap-2">
+        {isOpen && <ChangePasswordModal isOpen={isOpen} onOpenChange={onOpenChange} onClose={onClose} />}
         <Button
             className="bg-transparent w-full"
             radius="full"
@@ -40,7 +47,7 @@ export default function AvatarComponent() {
             onClick={handleDarkMode}
         >
           <Avatar
-              icon={darkMode ? <FaMoon /> : <FaSun /> }
+              icon={darkMode ? <FaMoon size="25px" /> : <FaSun size="25px" /> }
               classNames={{
                 base: "bg-gradient-to-br from-[#FFB457] to-[#FF705B]",
                 icon: "text-black/80",
@@ -68,11 +75,12 @@ export default function AvatarComponent() {
                       />
                     </Button>
                   </DropdownTrigger>
-                  <DropdownMenu aria-label="Static Actions" className="dark:text-white">
-                    <DropdownItem key="change-password">Change Password</DropdownItem>
+                  <DropdownMenu onAction={(key) => handleDropdown(key)} aria-label="Static Actions" className="dark:text-white">
+                    <DropdownItem key="changePassword" >
+                      Change Password
+                    </DropdownItem>
                     <DropdownItem key="logout" color="danger">
-                      <Link className="text-danger hover:text-white size-[100%] p-0"
-                      onClick={handleLogout}>Logout</Link>
+                      Logout
                     </DropdownItem>
                   </DropdownMenu>
                 </Dropdown>
