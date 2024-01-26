@@ -6,11 +6,17 @@ import * as Yup from "yup";
 import * as fetchUser from "./api/fetchUser.ts";
 import {toast, Toaster} from "react-hot-toast";
 import {redirect} from "react-router-dom";
+import {userStore} from "./store/userStore.ts";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = React.useState<boolean>(true);
   const [isVisible, setIsVisible] = React.useState<boolean>(false);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const {setIsLoggedIn} = userStore((state) => {
+    return {
+      setIsLoggedIn: state.setIsLoggedIn
+    }
+  })
 
   const formik = useFormik({
     initialValues: {
@@ -35,6 +41,7 @@ export default function Auth() {
         if (status === 200) {
           toast.success(data.message);
           document.cookie = data.token as string;
+          setIsLoggedIn(true);
           redirect("/");
         } else {
           toast.error(data.message);

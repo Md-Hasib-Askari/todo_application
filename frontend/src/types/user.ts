@@ -5,5 +5,5 @@ export type User = {
 
 export interface UserStore {
   isLoggedIn: boolean;
-  setIsLoggedIn: () => void;
+  setIsLoggedIn: (isLoggedIn: boolean) => void;
 }

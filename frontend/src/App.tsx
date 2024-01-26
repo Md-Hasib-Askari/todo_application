@@ -1,10 +1,9 @@
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Home from "./Home.tsx";
-import React, {useEffect} from "react";
+import {useEffect} from "react";
 import Auth from "./Auth.tsx";
 import * as fetchUser from "./api/fetchUser.ts";
 import {userStore} from "./store/userStore.ts";
-import {UserStore} from "./types/user.ts";
 
 const App = () => {
   const {isLoggedIn, setIsLoggedIn} = userStore((state) => {
@@ -19,9 +18,9 @@ const App = () => {
       const res = await fetchUser.isLoggedIn(document.cookie);
       const {status} = res;
       if (status === 200) {
-        setIsLoggedIn();
+        setIsLoggedIn(true);
       } else {
-        setIsLoggedIn();
+        setIsLoggedIn(false);
       }
     })();
   }, [])
