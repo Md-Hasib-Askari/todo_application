@@ -39,7 +39,6 @@ export default function Auth() {
         const res = await fetchUser.login(values);
         const {data, status} = res;
         if (status === 200) {
-          toast.success(data.message);
           setCookie("token", data.token, 1);
           setCookie("email", data.email, 1);
           setIsLoggedIn(true);
