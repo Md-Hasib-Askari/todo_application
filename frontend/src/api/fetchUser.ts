@@ -49,7 +49,11 @@ export const isLoggedIn = async (token: string) => {
 };
 
 export async function logout() {
-  return await axios.get(
-      `http://localhost:5000/api/v1/logout/`
-  );
+  try {
+    return await axios.get(
+        `http://localhost:5000/api/v1/logout/`
+    );
+  } catch (e: any) {
+    return e.response;
+  }
 }

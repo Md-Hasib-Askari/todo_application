@@ -40,7 +40,7 @@ export default function EditModal({ todo } : {
 
     return (
         <>
-            <Tooltip content="Edit Todo">
+            <Tooltip color="warning" content="Edit Todo">
                 <Button className="text-secondary border-b-3 cursor-pointer active:opacity-50"
                         onPress={onOpen}
                 >
@@ -56,11 +56,12 @@ export default function EditModal({ todo } : {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1">Edit</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1 dark:text-white">Edit</ModalHeader>
                             <ModalBody>
                                 <Input
                                     autoFocus
                                     label="Todo"
+                                    className="dark:text-white"
                                     variant="bordered"
                                     defaultValue={changedTodo}
                                     onChange={(event) => setChangedTodo(event.target.value)}

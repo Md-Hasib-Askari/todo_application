@@ -14,6 +14,7 @@ import {addData, getData, deleteData, updateData} from "./api/fetchTodo.ts";
 import {useTodoStore} from "./store/todoStore.ts";
 import {Todo} from "./types/todo.ts";
 import EditModal from "./components/EditModal.tsx";
+import AvatarComponent from "./components/AvatarComponent.tsx";
 
 const columns = [
     {name: "Todo", uid: "isDone"},
@@ -118,8 +119,11 @@ function Home() {
         setTodoList([...todoNotDone, ...todoDone]);
     }
   return (
-    <div className="h-screen flex justify-center">
+    <div className="relative h-screen flex justify-center">
         <div><Toaster /></div>
+        <div className="absolute top-[2rem] right-[2rem] dark:text-white">
+            <AvatarComponent />
+        </div>
         <Card className="w-2/3 h-3/4 mt-16 p-2">
             <CardHeader className="flex flex-col gap-4 mb-5">
                 <div className="w-full">
