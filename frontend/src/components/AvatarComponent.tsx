@@ -13,6 +13,7 @@ import {userStore} from "../store/userStore.ts";
 import * as fetchUser from "../api/fetchUser.ts";
 import {redirect} from "react-router-dom";
 import ChangePasswordModal from "./ChangePasswordModal.tsx";
+import {setCookie, getCookie} from "../utils/cookie.ts";
 
 export default function AvatarComponent() {
   const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
@@ -29,7 +30,8 @@ export default function AvatarComponent() {
     if (key === "logout") {
       const response = await fetchUser.logout();
       if (response.status === 200) {
-        document.cookie = "";
+        setCookie("token", "", 0);
+        setCookie("email", "", 0);
         setIsLoggedIn(false);
         redirect("/");
       }
@@ -62,9 +64,6 @@ export default function AvatarComponent() {
                         className="bg-transparent w-full"
                         radius="full"
                         isIconOnly={true}
-                        onClick={() => {
-                          console.log("test");
-                        }}
                     >
                       <Avatar
                           icon={<AvatarIcon />}
@@ -76,6 +75,9 @@ export default function AvatarComponent() {
                     </Button>
                   </DropdownTrigger>
                   <DropdownMenu onAction={(key) => handleDropdown(key)} aria-label="Static Actions" className="dark:text-white">
+                    <DropdownItem key="profile" isDisabled className="gap-2" showDivider>
+                      {getCookie("email")}
+                    </DropdownItem>
                     <DropdownItem key="changePassword" >
                       Change Password
                     </DropdownItem>

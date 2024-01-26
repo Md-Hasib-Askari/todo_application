@@ -7,6 +7,7 @@ import * as fetchUser from "./api/fetchUser.ts";
 import {toast, Toaster} from "react-hot-toast";
 import {redirect} from "react-router-dom";
 import {userStore} from "./store/userStore.ts";
+import {setCookie} from "./utils/cookie.ts";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = React.useState<boolean>(true);
@@ -37,10 +38,11 @@ export default function Auth() {
       if (isLogin) {
         const res = await fetchUser.login(values);
         const {data, status} = res;
-        console.log(data)
         if (status === 200) {
+          console.log(data);
           toast.success(data.message);
-          document.cookie = data.token as string;
+          setCookie("token", data.token, 1);
+          setCookie("email", data.email, 1);
           setIsLoggedIn(true);
           redirect("/");
         } else {
@@ -51,6 +53,7 @@ export default function Auth() {
         const {data, status} = res;
         if (status === 201) {
           toast.success(data.message);
+          setIsLogin(true);
           redirect("/");
         } else {
           toast.error(data.message);

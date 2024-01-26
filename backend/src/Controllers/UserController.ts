@@ -22,9 +22,8 @@ export const register = async (req: Request, res: Response) => {
   try {
     const newUser = new UserModel({email, password: hashedPassword});
     const response = await newUser.save();
-    const {_doc} = response as any;
-    const {password, ...rest} = _doc as any;
-    res.status(201).json({ message: "User created"});
+    if (!response) res.status(500).json({ message: "Something went wrong" });
+    else res.status(201).json({ message: "User created"});
   } catch (error: any) {
     res.status(500).json({ message: "Something went wrong" });
   }
@@ -47,8 +46,9 @@ export const login = async (req: Request, res: Response) => {
             const token: string = jwt.sign({email},
                 jwt_token,
                 {expiresIn: '1h'})
-            res.cookie('token', token, {httpOnly: true});
-            res.status(200).json({message: "Login Successful", token});
+            res.cookie('token', token, {httpOnly: true, sameSite: 'none', secure: true});
+            res.cookie('email', email, {httpOnly: true, sameSite: 'none', secure: true});
+            res.status(200).json({message: "Login Successful", token, email});
         }
     }
   } catch (e) {

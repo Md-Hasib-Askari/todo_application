@@ -4,6 +4,7 @@ import {useEffect} from "react";
 import Auth from "./Auth.tsx";
 import * as fetchUser from "./api/fetchUser.ts";
 import {userStore} from "./store/userStore.ts";
+import {getCookie} from "./utils/cookie.ts";
 
 const App = () => {
   const {isLoggedIn, setIsLoggedIn} = userStore((state) => {
@@ -12,10 +13,10 @@ const App = () => {
       setIsLoggedIn: state.setIsLoggedIn
     }
   })
-  console.log("test");
   useEffect(() => {
     (async () => {
-      const res = await fetchUser.isLoggedIn(document.cookie);
+      const token = getCookie("token");
+      const res = await fetchUser.isLoggedIn(token);
       const {status} = res;
       if (status === 200) {
         setIsLoggedIn(true);

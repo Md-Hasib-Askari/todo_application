@@ -10,10 +10,11 @@ interface jwtPayload {
 export const authVerify = async (req: Request, res: Response, next: NextFunction) => {
   let token: string;
   if (req.headers.authorization) {
-    token = (req.headers.authorization as string).split(" ")[1];
+    token = (req.headers.authorization as string).split(" ")[1].split(";")[0].split("=")[1];
   } else {
     token = req.cookies.token as string;
   }
+  console.log(token)
   jwt.verify(token, jwt_token, (err: any, decoded: any) => {
     if (err) {
       res.status(401).json({status: "unauthorized"});
